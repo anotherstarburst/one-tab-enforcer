@@ -2,11 +2,11 @@
 
 This is a wrapper for any function that ensures the website is only open in one tab.
 
-It was built to ensure some pages at (getchinwag.com)[https://www.getchinwag.com] were only open on one tab.
+It was built to ensure some pages at [getchinwag.com](https://www.getchinwag.com) were only open on one tab.
 
 ## Why use this
 
-1. It's tiny. Weighing in at a shade over 1kb.
+1. It's tiny. Weighing in at a shade over 1KB.
 2. Vanilla JavaScript, no dependencies
 3. Cross browser support with no need for cookies, sessionStorage, etc.
 
