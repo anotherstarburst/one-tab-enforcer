@@ -1,6 +1,6 @@
 {
   "name": "@anotherstarburst/one-tab-enforcer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A wrapper for any function that ensures the website is only open in one tab.",
   "main": "dist/index.js",
   "license": "MIT",
