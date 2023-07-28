@@ -9,5 +9,14 @@
   },
   "parserOptions": {
     "project": "./tsconfig.json"
-  }
+  },
+  "ignorePatterns": ["jest.config.js"],
+  "overrides": [
+    {
+      "files": ["**/__tests__/*.ts"],
+      "parserOptions": {
+        "project": "./__tests__/tsconfig.json"
+      }
+    }
+  ]
 }
