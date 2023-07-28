@@ -1,110 +1,159 @@
-# one-tab-enforcer
+# One-Tab Enforcer
 
-This is a wrapper for any function that ensures the website is only open in one tab.
+The One-Tab Enforcer is a lightweight utility built to ensure that specific pages of a website are only open in one tab at a time. Developed for use at [getchinwag.com](https://www.getchinwag.com), it provides an easy way to prevent resource duplication and potential issues related to having the same page open in multiple tabs.
 
-It was built to ensure some pages at [getchinwag.com](https://www.getchinwag.com) were only open on one tab.
+## Key Features
 
-## Why use this
+1. **Lightweight:** The One-Tab Enforcer is very minimal, weighing in at just over 1KB.
+2. **No Dependencies:** Written in vanilla JavaScript, it doesn't require any additional libraries to function.
+3. **Cross-Browser Support:** It works across different browsers and does not rely on cookies, sessionStorage, etc.
 
-1. It's tiny. Weighing in at a shade over 1KB.
-2. Vanilla JavaScript, no dependencies
-3. Cross browser support with no need for cookies, sessionStorage, etc.
+## Usage
 
-## Using this module
+### Installation
 
-1. Install this package
+First, install the package using npm:
 
-   `npm install @anotherstarburst/one-tab-enforcer --save`
+```bash
+npm install @anotherstarburst/one-tab-enforcer --save
+```
 
-2. Wrap the function you want to run as follows
+### Basic Usage
+
+To use the One-Tab Enforcer, simply wrap the function that you want to run in a unique tab as follows:
 
 ```javascript
 import oneTabEnforcer from 'one-tab-enforcer';
 
-const customMarkup = `
-  <div style=" display: flex;justify-content: center;flex-direction: column;height: 100vh; text-align: center;" >
-    <h1>
-      ⚠️ Yo! Our mainframe can only support one tab.
-    </h1>
-  </div>
-`;
+const customWarningMarkup = `<div style="display: flex; justify-content: center; flex-direction: column; height: 100vh; text-align: center;">
+<h1>⚠️ Yo! Our server can only support one tab.</h1>
 
-function functionYouWantToRun() {
-  console.log('It works!');
+</div>`;
+
+function myFunction() {
+  console.log('This function is running in a unique tab!');
 }
 
 oneTabEnforcer(
   {
-    appID: 'some-unique-name', // make this unique such that other listeners on this domain don't pick up the uniqueness check
-    timeout: 50, // (optional) how long to wait for other tabs to respond before executing the function
-    warningQuerySelector: '#root', // (optional) where should we write the warning?
-    warningMarkup: customMarkup, // (optional) what should the markup say. HTML in backticks please.
+    appID: 'my-app', // This should be unique to prevent conflicts with other listeners on the same domain.
+    timeout: 50, // This is optional and defines how long to wait (in milliseconds) for other tabs to respond before executing the function.
+    warningQuerySelector: '#root', // This is optional and defines where the warning should be displayed in the DOM.
+    warningMarkup: customWarningMarkup, // This is optional and defines the HTML markup to display as a warning.
   },
-  functionYouWantToRun
+  myFunction,
 );
 ```
 
-### Passing variables
+### With Variable Passing
 
-It's a little messy...
+Here's how you can pass variables to the function:
 
 ```javascript
 import oneTabEnforcer from '@anotherstarburst/one-tab-enforcer';
 
-const customMarkup = `
-  <div style=" display: flex;justify-content: center;flex-direction: column;height: 100vh; text-align: center;" >
-    <h1>
-      ⚠️ Yo! Our mainframe can only support one tab.
-    </h1>
-  </div>
-`;
+const customWarningMarkup = `<div style="display: flex; justify-content: center; flex-direction: column; height: 100vh; text-align: center;">
+<h1>⚠️ Yo! Our server can only support one tab.</h1>
 
-function functionYouWantToRun(myHandyVariable) {
-  console.log(myHandyVariable);
+</div>`;
+
+function myFunction(myVariable) {
+  console.log(myVariable);
 }
 
 oneTabEnforcer(
   {
-    appID: 'some-unique-name', // make this unique such that other listeners on this domain don't pick up the uniqueness check
-    timeout: 50, // (optional) how long to wait for other tabs to respond before executing the function
-    warningQuerySelector: '#root', // (optional) where should we write the warning?
-    warningMarkup: customMarkup, // (optional) what should the markup say. HTML in backticks please.
+    appID: 'my-app',
+    timeout: 50,
+    warningQuerySelector: '#root',
+    warningMarkup: customWarningMarkup,
   },
   () => {
-    const myHandyVariable = 'It still works!';
-    functionYouWantToRun(myHandyVariable);
-  }
+    const myVariable = 'Hello, world!';
+    myFunction(myVariable);
+  },
 );
 ```
 
-## Under the hood
+## How it Works
 
-We're using the [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel) to send a message to other listening channels on the same domain. The original tab will be the only one that should remain live, with any others getting the `warningMarkup` presented to them.
+The One-Tab Enforcer utilizes the [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel) to communicate between different tabs open on the same domain. When a message is received from another tab, it displays the warning and prevents the function from running.
 
 ### Notes
 
-- The [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel) ensures that the plugin will only look for unique tabs on a single domain.
+- The `appID` can be any string, but it should be unique to each instance of the One-Tab Enforcer on a single domain to prevent conflicts.
 
-- The `appID` can be anything. But if you want to have multiple instances of the one-tab-enforcer running on a single domain without conflict, please make it something sensible.
+### Development Setup
 
-### Setting up the development environment for this module
+1. Clone the repository:
 
-1. Clone
+   ```bash
+   git clone https://github.com/anotherstarburst/one-tab-enforcer.git
+   ```
 
-   `git clone https://github.com/anotherstarburst/one-tab-enforcer.git`
+2. Install the dependencies:
 
-2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-   `npm install`
+3. Start the server:
 
-3. Run
+   ```bash
+   npm start
+   ```
 
-   `npm start`
+4. Open the page in multiple tabs to see the One-Tab Enforcer in action.
 
-4. Open multiple tabs to see the magic in action.
+## Planned Features
 
-##  TODO's
+- **Optimization:** Review the dev dependency list and remove unused ones.
 
-- Tests
-  - Can probably embed an iframe in a page to simulate a second tab
-- Remove unused (dev) dependencies
+## Contributions
+
+We warmly welcome contributions from the community. If you're interested in contributing, please follow these steps:
+
+1. **Fork the repository**: Use the GitHub UI to fork the repository to your own GitHub account.
+
+2. **Clone your forked repository**: Clone your forked repository to your local machine using:
+
+   ```bash
+   git clone https://github.com/<YOUR_USERNAME>/one-tab-enforcer.git
+   ```
+
+3. **Create a new branch**: Always create a new branch for your changes. Keep the branch name descriptive:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Make your changes**: Make the changes you wish to contribute. Be sure to test them thoroughly.
+
+5. **Commit your changes**: Commit your changes to your local repository:
+
+   ```bash
+   git add .
+   git commit -m "A short description of the change."
+   ```
+
+6. **Push your changes**: Push your changes to your forked repository on GitHub:
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+7. **Create a pull request**: Use the GitHub UI on your forked repository to create a new pull request. Provide a clear and comprehensive description of the changes in your PR.
+
+## Code of Conduct
+
+As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.
+
+We are committed to making participation in this project a harassment-free experience for everyone, regardless of the level of their experience, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, or religion.
+
+## License
+
+This project is open source, and is licensed under the MIT License. Please see the [LICENCE](LICENCE) file for the full text of the license.
+
+## Support
+
+If you encounter any issues or have questions about using the library, please create a [new issue](https://github.com/anotherstarburst/one-tab-enforcer/issues/new) on our GitHub page.
