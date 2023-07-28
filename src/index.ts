@@ -1,7 +1,8 @@
-/* eslint-disable no-console */
-
-const defaultMarkup: string = `
-  <div style=" display: flex;justify-content: center;flex-direction: column;height: 100vh; text-align: center;" >
+/**
+ * The default HTML markup to display when a duplicate tab is detected.
+ */
+const defaultWarningMarkup: string = `
+  <div style="display: flex; justify-content: center; flex-direction: column; height: 100vh; text-align: center;" >
     <h1>
       ⚠️ This is a duplicate tab - please shut it down.
     </h1>
@@ -9,82 +10,92 @@ const defaultMarkup: string = `
 `;
 
 /**
- * Description.
- * This sends a warning to the DOM.
- *
- * @param {String} warningMarkup Markup for the warning. This will be put in an element's innerHTML.
- * @param {String} warningQuerySelector The query selector that we'll put the warning markup into.
- * @returns {void}
+ * Interface defining the options that can be passed to the DuplicateTabEnforcer function.
  */
-function showWarning(warningMarkup: string, warningQuerySelector: string): void {
-  console.warn('theEnforcer>showWarning: Close this tab down, it is a duplicate');
-  const markup = warningMarkup || defaultMarkup;
-
-  if (warningQuerySelector) {
-    const elm = document.querySelector(warningQuerySelector);
-    elm.innerHTML = markup;
-    return;
-  }
-
-  const elm = document.createElement('div');
-  elm.innerHTML = markup;
-  document.body.prepend(elm);
+interface EnforcerOptions {
+  appID?: string;
+  timeout?: number;
+  warningQuerySelector?: string;
+  warningMarkup?: string;
 }
 
-function theEnforcer(
-  { appID = 'some-unique-name', timeout = 50, warningQuerySelector = '', warningMarkup = '' },
-  functionToRun: Function
-) {
-  console.debug('theEnforcer');
-  let siblingsFound = null;
+/**
+ * Display a warning message in the console and on the DOM.
+ *
+ * @param {String} markup Markup for the warning. This will be put in an element's innerHTML.
+ * @param {String} querySelector The query selector that we'll put the warning markup into.
+ * @returns {void}
+ */
+function displayWarning(markup: string, querySelector: string): void {
+  const effectiveMarkup = markup || defaultWarningMarkup;
+
+  let targetElement: HTMLElement;
+
+  if (querySelector) {
+    targetElement = document.querySelector(querySelector);
+    if (!targetElement) {
+      console.warn(`No element matches the provided query selector "${querySelector}".`);
+      return;
+    }
+  } else {
+    targetElement = document.createElement('div');
+    document.body.prepend(targetElement);
+  }
+
+  targetElement.innerHTML = effectiveMarkup;
+}
+
+/**
+ * Ensure that the provided function runs only once in a unique tab.
+ *
+ * @param {EnforcerOptions} options Configuration options.
+ * @param {Function} functionToRun The function to run when no duplicate tab is detected.
+ */
+// eslint-disable-next-line @typescript-eslint/default-param-last
+function DuplicateTabEnforcer(options: EnforcerOptions = {}, functionToRun: Function): void {
+  const { appID = 'some-unique-name', timeout = 50, warningQuerySelector = '', warningMarkup = '' } = options;
+
+  let duplicateTabDetected: boolean | null = null;
 
   /**
-   * Description.
-   * Checks to see if siblings have been found and if not it'll execute the `functionToRun()`.
-   * Note, that this function should only run once.
+   * Execute the provided function if no duplicate tab is detected.
    *
-   * @returns {(boolean|Function)}
+   * @returns {boolean}
    */
-  function checkNoSiblings(): boolean | Function {
-    console.debug('theEnforcer>checkNoSiblings');
-    if (siblingsFound !== null) {
-      console.debug('theEnforcer>checkNoSiblings: siblingsFound !== null');
-      // either this function has run already (`siblingsFound === false `)or siblings
-      // have been found (`siblingsFound = true`)
+  function executeIfUnique(): boolean {
+    if (duplicateTabDetected !== null) {
+      console.warn('Duplicate tab detected or function has already been executed. Function will not be executed.');
       return false;
     }
 
-    siblingsFound = false;
-    return functionToRun();
+    duplicateTabDetected = false;
+    functionToRun();
+    return true;
   }
 
   /**
-   * Description.
-   * Kicks off a search for sibling tabs that are listening on the same BroadcastChannel.
-   * If found within the `timeout` wait time, it'll shut down the BroadcastChannel listener and
-   * show the warning markup.
+   * Start a search for duplicate tabs.
+   * If a duplicate tab is found within the specified timeout, show a warning and stop the function execution.
    */
-  function searchForSibling() {
-    console.debug('theEnforcer>searchForSibling');
+  function initiateTabSearch(): void {
     const bc = new BroadcastChannel(appID);
 
-    bc.onmessage = (event) => {
-      console.debug('theEnforcer>searchForSibling>bc.onmessage', event);
+    bc.onmessage = (event: MessageEvent): void => {
       if (event.data === 'pong') {
-        siblingsFound = true;
-        showWarning(warningMarkup, warningQuerySelector);
+        duplicateTabDetected = true;
+        displayWarning(warningMarkup, warningQuerySelector);
         bc.close();
-        return;
+      } else {
+        bc.postMessage('pong');
       }
-      bc.postMessage('pong');
     };
+
     bc.postMessage('ping');
-    setTimeout(() => {
-      checkNoSiblings();
-    }, timeout);
+
+    setTimeout(executeIfUnique, timeout);
   }
 
-  searchForSibling();
+  initiateTabSearch();
 }
 
-export default theEnforcer;
+export default DuplicateTabEnforcer;
