@@ -5,7 +5,7 @@ The One-Tab Enforcer is a lightweight utility built to ensure that specific page
 ## Key Features
 
 1. **Lightweight:** The One-Tab Enforcer is very minimal, weighing in at just over 1KB.
-2. **No Dependencies:** Written in vanilla JavaScript, it doesn't require any additional libraries to function.
+2. **No Dependencies:** Written in Typescript - compiled to JavaScript, it doesn't require any additional libraries to function.
 3. **Cross-Browser Support:** It works across different browsers and does not rely on cookies, sessionStorage, etc.
 
 ## Usage
