@@ -97,13 +97,19 @@ The One-Tab Enforcer utilizes the [BroadcastChannel API](https://developer.mozil
    npm install
    ```
 
-3. Start the server:
+3. Run unit tests:
+
+   ```bash
+   npm test
+   ```
+
+4. Start the server:
 
    ```bash
    npm start
    ```
 
-4. Open the page in multiple tabs to see the One-Tab Enforcer in action.
+5. Open the page in multiple tabs to see the One-Tab Enforcer in action.
 
 ## Planned Features
 
