@@ -12,7 +12,7 @@ const defaultWarningMarkup: string = `
 /**
  * Interface defining the options that can be passed to the DuplicateTabEnforcer function.
  */
-interface EnforcerOptions {
+interface DuplicateTabEnforcerOptions {
   appID?: string;
   timeout?: number;
   warningQuerySelector?: string;
@@ -48,11 +48,11 @@ function displayWarning(markup: string, querySelector: string): void {
 /**
  * Ensure that the provided function runs only once in a unique tab.
  *
- * @param {EnforcerOptions} options Configuration options.
+ * @param {DuplicateTabEnforcerOptions} options Configuration options.
  * @param {Function} functionToRun The function to run when no duplicate tab is detected.
  */
 // eslint-disable-next-line @typescript-eslint/default-param-last
-function DuplicateTabEnforcer(options: EnforcerOptions = {}, functionToRun: Function): void {
+function DuplicateTabEnforcer(options: DuplicateTabEnforcerOptions = {}, functionToRun: Function): void {
   const { appID = 'some-unique-name', timeout = 50, warningQuerySelector = '', warningMarkup = '' } = options;
 
   let duplicateTabDetected: boolean | null = null;
