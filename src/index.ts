@@ -68,7 +68,7 @@ function DuplicateTabEnforcer(options: DuplicateTabEnforcerOptions = {}, functio
    *
    * @returns {boolean}
    */
-  function executeIfUnique(): boolean {
+  function executeFunctionIfUnique(): boolean {
     if (duplicateTabDetected !== null) {
       console.warn('Duplicate tab detected or function has already been executed. Function will not be executed.');
       return false;
@@ -98,7 +98,7 @@ function DuplicateTabEnforcer(options: DuplicateTabEnforcerOptions = {}, functio
 
     bc.postMessage(PostMessageType.PING);
 
-    setTimeout(executeIfUnique, timeout);
+    setTimeout(executeFunctionIfUnique, timeout);
   }
 
   initiateTabSearch();
