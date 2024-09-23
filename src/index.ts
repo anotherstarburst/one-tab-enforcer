@@ -1,3 +1,4 @@
+
 /**
  * The default HTML markup to display when a duplicate tab is detected.
  */
@@ -17,6 +18,11 @@ interface DuplicateTabEnforcerOptions {
   timeout?: number;
   warningQuerySelector?: string;
   warningMarkup?: string;
+}
+
+enum PostMessageType {
+  PING = 'ping',
+  PONG = 'pong',
 }
 
 /**
@@ -81,16 +87,16 @@ function DuplicateTabEnforcer(options: DuplicateTabEnforcerOptions = {}, functio
     const bc = new BroadcastChannel(appID);
 
     bc.onmessage = (event: MessageEvent): void => {
-      if (event.data === 'pong') {
+      if (event.data === PostMessageType.PONG) {
         duplicateTabDetected = true;
         displayWarning(warningMarkup, warningQuerySelector);
         bc.close();
       } else {
-        bc.postMessage('pong');
+        bc.postMessage(PostMessageType.PONG);
       }
     };
 
-    bc.postMessage('ping');
+    bc.postMessage(PostMessageType.PING);
 
     setTimeout(executeIfUnique, timeout);
   }
